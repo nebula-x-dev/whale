@@ -1,2 +1,22 @@
 /* For information on how to create your own theme, please see:
 http://ionicframework.com/docs/theming/ */
+@font-face {
+  font-family: 'yekan';
+  src: url('/assets/fonts/black1.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body, ion-label, ion-title, ion-button, ion-tab-button {
+  font-family: 'yekan', sans-serif !important;
+}
+ion-title, 
+ion-label, 
+ion-card-title, 
+ion-card-subtitle, 
+ion-button, 
+ion-tab-button, 
+ion-text, 
+ion-item {
+  font-family: 'yekan', sans-serif !important;
+}

@@ -66,6 +66,14 @@ interface Ticker {
   signal: string;
 }
 
+// --- LICENSE TYPES ---
+interface LicenseResult {
+  valid: boolean;
+  user?: string;
+  exp?: Date;
+  reason?: string;
+}
+
 const licenseKey = ref('');
 const licenseError = ref('');
 const licenseValid = ref(false);
@@ -77,7 +85,7 @@ const lastUpdated = ref('');
 const apiUrl = 'https://api.bitpin.org/api/v1/mkt/tickers/';
 
 // --- LICENSE LOGIC ---
-function validateLicense(key: string) {
+function validateLicense(key: string): LicenseResult {
   try {
     const decoded = JSON.parse(atob(key.trim()));
     const exp = new Date(decoded.expiresAt);
@@ -91,8 +99,9 @@ function validateLicense(key: string) {
 
 function submitLicense() {
   const result = validateLicense(licenseKey.value);
-  if (!result.valid) licenseError.value = result.reason;
-  else {
+  if (!result.valid && result.reason) {
+    licenseError.value = result.reason;
+  } else {
     localStorage.setItem('licenseKey', licenseKey.value);
     licenseValid.value = true;
     fetchData();
@@ -130,20 +139,31 @@ async function fetchData() {
   loading.value = true;
   try {
     const res = await fetch(apiUrl);
-    if(!res.ok) throw new Error(`HTTP error: ${res.status}`);
+    if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
     const data = await res.json();
+
     tickers.value = data.map((it: any) => {
       const price = parseNum(it.price);
       const change = parseNum(it.daily_change_price);
       const score = computeScore({ ...it, price, daily_change_price: change });
+
+      // اصلاح شده: marketType همیشه string
+      const marketType = it.symbol && it.symbol.includes('_')
+        ? (it.symbol.split('_')[1] ?? 'unknown')
+        : 'unknown';
+
       return {
-        ...it, price, daily_change_price: change, score,
+        ...it,
+        price,
+        daily_change_price: change,
+        score,
         signal: signalFromScore(score),
-        marketType: it.symbol?.includes('_') ? it.symbol.split('_')[1] : 'unknown',
+        marketType,
       };
     });
+
     lastUpdated.value = new Date().toLocaleTimeString('fa-IR');
-  } catch(e: any) {
+  } catch (e: any) {
     console.error(e);
   } finally {
     loading.value = false;
@@ -171,5 +191,12 @@ const filteredTickers = computed(() => tickers.value);
   flex-direction: column;
   gap: 10px;
 }
-textarea { width: 100%; border-radius: 8px; background:#061226; color:#cfe3ff; border:1px solid rgba(255,255,255,0.1); padding: 8px; }
+textarea { 
+  width: 100%; 
+  border-radius: 8px; 
+  background:#061226; 
+  color:#cfe3ff; 
+  border:1px solid rgba(255,255,255,0.1); 
+  padding: 8px; 
+}
 </style>

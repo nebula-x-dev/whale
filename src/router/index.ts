@@ -22,11 +22,11 @@ const showAccessDeniedAlert = async () => {
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/otp'
+    redirect: '/tabs' // 🚀 دیگه اپ از /tabs شروع میشه
   },
   {
     path: '/otp',
-    component: () => import('@/views/otp.vue') // فایل otp.vue شما
+    component: () => import('@/views/otp.vue') // اگه خواستی دستی بری OTP
   },
   {
     path: '/tabs/',

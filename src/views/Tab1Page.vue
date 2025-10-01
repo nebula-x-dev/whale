@@ -133,7 +133,7 @@ const sendMessage = async () => {
   messages.value.push({ user: 'me', text: userMessage.value });
 
   const query = encodeURIComponent(userMessage.value);
-  const apiUrl = `http://ariyanwood.ir/test/ai.php?q=${query}`;
+  const apiUrl = `https://ariyanwood.ir/test/ai.php?q=${query}`;
 
   try {
     const res = await fetch(apiUrl);
